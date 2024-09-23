@@ -32,6 +32,10 @@ app.use(express.json());
 
 app.use('/api', appRouter);
 
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
+
 const appServer = http.createServer(app);
 const io = new Server(appServer, {
   cors: {
