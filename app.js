@@ -33,8 +33,8 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.get('/', (req, res) => {
-    res.send('Hello World');
+app.get('/get', (req, res) => {
+    res.json({status:true,host:HOST,msg:'Hello World');
 });
 
 // Create server
