@@ -1,23 +1,3 @@
-// require('./config');
-// require('./constants');
-// const express = require('express');
-// const cors = require('cors');
-// const router = require('./app/index');
-// const appRouter = require('./app/routes/index');
-
-// const app = express();
-// app.use(cors());
-// app.use(express.json());
-
-// // app.use('/', router);
-// app.use('/api', appRouter);
-
-// const PORT = process.env.PORT || 3099;
-
-// app.listen(PORT, () => {
-//     console.log(`Server is running on port ${PORT}`);
-// });
-
 require('./config');
 require('./constants');
 const express = require('express');
@@ -27,24 +7,55 @@ const http = require('http');
 const appRouter = require('./app/routes/index');
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
+const allowedOrigins = [
+  'http://192.168.0.127:4299',
+  'http://localhost:4299',
+  'https://restaurant-ang.vercel.app/'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type'],
+}));
+
+app.use(express.json());
 app.use('/api', appRouter);
 
 app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
+app.get('/', (req, res) => {
+    res.send('Hello World');
+});
+
+// Create server
 const appServer = http.createServer(app);
+
+// Socket.IO setup with CORS
 const io = new Server(appServer, {
   cors: {
-    origin: 'http://192.168.0.127:4299',
-    methods: ['GET', 'POST'],
+    origin: (origin, callback) => {
+      if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type'],
   }
 });
 
+// Socket.IO connection
 io.on('connection', (socket) => {
   console.log('New WebSocket client connected');
   socket.on('orderData', (data) => {
@@ -52,8 +63,8 @@ io.on('connection', (socket) => {
   });
 });
 
+// Start server
 const PORT = process.env.PORT || 3099;
-
 appServer.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
