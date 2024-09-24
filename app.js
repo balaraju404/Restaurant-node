@@ -36,7 +36,7 @@ app.get('/', (req, res) => {
 app.get('/get', (req, res) => {
     res.json({status:true,host:HOST,msg:'Hello World');
 });
-
+console.log(HOST)
 // Create server
 const appServer = http.createServer(app);
 
