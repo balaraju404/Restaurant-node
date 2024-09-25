@@ -7,8 +7,10 @@ const http = require('http');
 const appRouter = require('./app/routes/index');
 
 const app = express();
+const list = process.env.WHITELIST_DOMAIN.split(',')
+console.log(list);
 
-const allowedOrigins = [
+const allowedOrigins = list || [
   'http://192.168.0.127:4299',
   'http://localhost:4299',
   'https://restaurant-ang.vercel.app/'
@@ -36,7 +38,7 @@ app.get('/', (req, res) => {
 app.get('/get', (req, res) => {
     res.json({status:true,host:HOST,msg:'Hello World'});
 });
-console.log(HOST)
+
 // Create server
 const appServer = http.createServer(app);
 
@@ -57,6 +59,8 @@ const io = new Server(appServer, {
 
 // Socket.IO connection
 io.on('connection', (socket) => {
+  console.log(socket);
+  
   console.log('New WebSocket client connected');
   socket.on('orderData', (data) => {
     io.emit('orderData', JSON.stringify(data));
